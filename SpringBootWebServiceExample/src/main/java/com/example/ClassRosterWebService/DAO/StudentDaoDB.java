@@ -14,7 +14,7 @@ import java.util.List;
 public class StudentDaoDB implements StudentDao {
 
     @Autowired
-    JdbcTemplate jdbc;
+    private JdbcTemplate jdbc;
 
     private static class StudentMapper implements RowMapper<Student> {
         @Override
@@ -36,7 +36,7 @@ public class StudentDaoDB implements StudentDao {
 
     @Override
     public void addStudent(Student student) {
-        final String ADD = "INSERT INTO student(firstName,lastName,email) VALUES(?,?,?)";
+        final String ADD = "INSERT INTO student(firstName, lastName, email) VALUES (?, ?, ?)";
         jdbc.update(ADD, student.getFirstName(), student.getLastName(), student.getEmail());
     }
 
@@ -49,7 +49,8 @@ public class StudentDaoDB implements StudentDao {
     @Override
     public Student getStudentById(int id) {
         final String GET_ONE = "SELECT * FROM student WHERE id=?";
-        return jdbc.queryForObject(GET_ONE, new Object[]{id}, new StudentMapper());
+        return jdbc.query(GET_ONE, new Object[]{id}, new StudentMapper())
+                .stream().findFirst().orElse(null); // Avoid deprecated queryForObject
     }
 
     @Override
@@ -59,7 +60,14 @@ public class StudentDaoDB implements StudentDao {
                 student.getFirstName(),
                 student.getLastName(),
                 student.getEmail(),
-                student.getId()
-        );
+                student.getId());
+    }
+
+    @Override
+    public List<Student> getStudentByCourse(int courseId) {
+        final String GET_BY_COURSE = "SELECT s.* FROM student s " +
+                "JOIN student_course sc ON s.id=sc.student_id " +
+                "WHERE sc.course_id=?";
+        return jdbc.query(GET_BY_COURSE, new Object[]{courseId}, new StudentMapper());
     }
 }

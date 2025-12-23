@@ -4,16 +4,10 @@ import com.example.ClassRosterWebService.Entity.Student;
 import java.util.List;
 
 public interface StudentDao {
-
-    Student getStudentById(int id);
-
     List<Student> getAllStudents();
-
-    Student addStudent(Student student);
-
-    void updateStudent(Student student);
-
+    void addStudent(Student student);
     void deleteStudentById(int id);
-
-    List<Student> getStudentByCourse(int courseId);
+    Student getStudentById(int id);
+    void updateStudent(Student student);
+    List<Student> getStudentByCourse(int courseId); // new method
 }
