@@ -14,60 +14,70 @@ import java.util.List;
 public class StudentDaoDB implements StudentDao {
 
     @Autowired
-    private JdbcTemplate jdbc;
+    JdbcTemplate jdbc;
 
-    private static class StudentMapper implements RowMapper<Student> {
+    private final RowMapper<Student> studentMapper = new RowMapper<Student>() {
         @Override
-        public Student mapRow(ResultSet rs, int rowNum) throws SQLException {
-            return new Student(
-                    rs.getInt("id"),
-                    rs.getString("firstName"),
-                    rs.getString("lastName"),
-                    rs.getString("email")
-            );
+        public Student mapRow(ResultSet rs, int index) throws SQLException {
+            Student s = new Student();
+            s.setId(rs.getInt("studentId"));
+            s.setFirstName(rs.getString("firstName"));
+            s.setLastName(rs.getString("lastName"));
+            s.setCourseId(rs.getInt("courseId"));
+            return s;
         }
-    }
+    };
 
+    // ---------------- READ ----------------
     @Override
     public List<Student> getAllStudents() {
-        final String GET_ALL = "SELECT * FROM student";
-        return jdbc.query(GET_ALL, new StudentMapper());
-    }
-
-    @Override
-    public void addStudent(Student student) {
-        final String ADD = "INSERT INTO student(firstName, lastName, email) VALUES (?, ?, ?)";
-        jdbc.update(ADD, student.getFirstName(), student.getLastName(), student.getEmail());
-    }
-
-    @Override
-    public void deleteStudentById(int id) {
-        final String DELETE = "DELETE FROM student WHERE id=?";
-        jdbc.update(DELETE, id);
+        return jdbc.query("SELECT * FROM Student", studentMapper);
     }
 
     @Override
     public Student getStudentById(int id) {
-        final String GET_ONE = "SELECT * FROM student WHERE id=?";
-        return jdbc.query(GET_ONE, new Object[]{id}, new StudentMapper())
-                .stream().findFirst().orElse(null); // Avoid deprecated queryForObject
-    }
-
-    @Override
-    public void updateStudent(Student student) {
-        final String UPDATE = "UPDATE student SET firstName=?, lastName=?, email=? WHERE id=?";
-        jdbc.update(UPDATE,
-                student.getFirstName(),
-                student.getLastName(),
-                student.getEmail(),
-                student.getId());
+        return jdbc.query(
+                "SELECT * FROM Student WHERE studentId = ?",
+                studentMapper,
+                id
+        ).stream().findFirst().orElse(null);
     }
 
     @Override
     public List<Student> getStudentByCourse(int courseId) {
-        final String GET_BY_COURSE = "SELECT s.* FROM student s " +
-                "JOIN student_course sc ON s.id=sc.student_id " +
-                "WHERE sc.course_id=?";
-        return jdbc.query(GET_BY_COURSE, new Object[]{courseId}, new StudentMapper());
+        return jdbc.query(
+                "SELECT * FROM Student WHERE courseId = ?",
+                studentMapper,
+                courseId
+        );
+    }
+
+    // ---------------- CREATE ----------------
+    @Override
+    public void addStudent(Student student) {
+        jdbc.update(
+                "INSERT INTO Student(firstName, lastName, courseId) VALUES (?, ?, ?)",
+                student.getFirstName(),
+                student.getLastName(),
+                student.getCourseId()
+        );
+    }
+
+    // ---------------- UPDATE (EDIT FIX) ----------------
+    @Override
+    public void updateStudent(Student student) {
+        jdbc.update(
+                "UPDATE Student SET firstName = ?, lastName = ?, courseId = ? WHERE studentId = ?",
+                student.getFirstName(),
+                student.getLastName(),
+                student.getCourseId(),
+                student.getId()
+        );
+    }
+
+    // ---------------- DELETE ----------------
+    @Override
+    public void deleteStudentById(int id) {
+        jdbc.update("DELETE FROM Student WHERE studentId = ?", id);
     }
 }
