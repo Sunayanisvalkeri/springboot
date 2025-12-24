@@ -1,49 +1,52 @@
-package com.example.ClassRosterWebService.Controller;
+package com.example.ClassRosterWebService.controller;
 
-import com.example.ClassRosterWebService.DAO.StudentDao;
-import com.example.ClassRosterWebService.Entity.Student;
-import jakarta.validation.Valid;
+import com.example.ClassRosterWebService.DAO.StudentDaoDB;
+import com.example.ClassRosterWebService.model.Student;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 public class StudentController {
 
     @Autowired
-    StudentDao studentDao;
+    private StudentDaoDB studentDao;
 
-    @GetMapping("students")
-    public String displayStudents(Model model) {
-        List<Student> students = studentDao.getAllStudents();
-        model.addAttribute("students", students);
-        model.addAttribute("student", new Student()); // IMPORTANT
+    @GetMapping("/students")
+    public String listStudents(Model model) {
+        model.addAttribute("students", studentDao.getAllStudents());
         return "students";
     }
 
-    @PostMapping("addStudent")
-    public String addStudent(
-            @Valid Student student,
-            BindingResult result,
-            Model model) {
+    @GetMapping("/students/add")
+    public String showAddForm(Model model) {
+        model.addAttribute("student", new Student());
+        return "add-student";
+    }
 
-        if (result.hasErrors()) {
-            model.addAttribute("students", studentDao.getAllStudents());
-            return "students"; // NO redirect → prevents loop
-        }
-
+    @PostMapping("/students/add")
+    public String addStudent(@ModelAttribute Student student) {
         studentDao.addStudent(student);
         return "redirect:/students";
     }
 
-    @GetMapping("deleteStudent")
-    public String deleteStudent(int id) {
-        studentDao.deleteStudentById(id);
+    @GetMapping("/students/edit/{id}")
+    public String showEditForm(@PathVariable int id, Model model) {
+        Student student = studentDao.getStudentById(id);
+        model.addAttribute("student", student);
+        return "edit-student";
+    }
+
+    @PostMapping("/students/edit")
+    public String editStudent(@ModelAttribute Student student) {
+        studentDao.updateStudent(student);
+        return "redirect:/students";
+    }
+
+    @GetMapping("/students/delete/{id}")
+    public String deleteStudent(@PathVariable int id) {
+        studentDao.deleteStudent(id);
         return "redirect:/students";
     }
 }

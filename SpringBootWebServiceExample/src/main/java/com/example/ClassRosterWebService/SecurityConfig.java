@@ -1,4 +1,4 @@
-package com.example.ClassRosterWebService;
+package com.example.ClassRosterWebService.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,20 +10,14 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-
-        http
-                // Disable CSRF (THIS FIXES YOUR ERROR)
-                .csrf(csrf -> csrf.disable())
-
-                // Allow all requests
-                .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll()
-                )
-
-                // Disable login page redirect
-                .formLogin(form -> form.disable())
-                .httpBasic(basic -> basic.disable());
-
+        http.csrf().disable()
+                .authorizeHttpRequests()
+                .requestMatchers("/students/**").permitAll()
+                .anyRequest().authenticated()
+                .and()
+                .formLogin()
+                .and()
+                .logout();
         return http.build();
     }
 }
