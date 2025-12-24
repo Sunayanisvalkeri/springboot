@@ -2,12 +2,9 @@ package com.example.ClassRosterWebService.DAO;
 
 import com.example.ClassRosterWebService.Entity.Teacher;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -16,124 +13,40 @@ import java.util.List;
 public class TeacherDaoDB implements TeacherDao {
 
     @Autowired
-    JdbcTemplate jdbc;
+    private JdbcTemplate jdbc;
 
-
-    @Override
-    public Teacher getTeacherById(int id) {
-        try {
-            final String GET_TEACHER_BY_ID = "SELECT * FROM teacher WHERE id = ?";
-            return jdbc.queryForObject(GET_TEACHER_BY_ID, new TeacherMapper(), id);
-        } catch(DataAccessException ex) {
-            return null;
-        }    }
-
+    private static final class TeacherMapper implements RowMapper<Teacher> {
+        @Override
+        public Teacher mapRow(ResultSet rs, int rowNum) throws SQLException {
+            Teacher teacher = new Teacher();
+            teacher.setId(rs.getInt("id"));
+            teacher.setName(rs.getString("name"));
+            return teacher;
+        }
+    }
 
     @Override
     public List<Teacher> getAllTeachers() {
-        Integer x = 2, y = 9;
-        String val1 = x.toString();
-        String val2 = y.toString();
-        final String GET_ALL_TEACHERS = "SELECT * FROM teacher";
-        return jdbc.query(GET_ALL_TEACHERS, new TeacherMapper());
-    }
-
-    public List<Teacher> getAllMIDAndTopicTeachers() {
-        final String GET_ALL_TEACHERS = "SELECT id, specialty FROM " +
-                "teacher where specialty" +
-                "like 'M%";
-        return jdbc.query(GET_ALL_TEACHERS, new MTopicsIDAndTopicTeacherMapper());
+        return jdbc.query("SELECT * FROM teacher", new TeacherMapper());
     }
 
     @Override
-    public List<String> getTeacherByCourse()
-    {
-        final String GET_TEACHER_BY_COURSE = "Select t.Firstname, t.lastName, c.name \n" +
-                "from teacher t \n" +
-                "join course c on t.id = c.teacherId;";
-        return jdbc.query(GET_TEACHER_BY_COURSE, new TeacherByCourseMapper());
-
+    public Teacher getTeacherById(int id) {
+        return jdbc.queryForObject("SELECT * FROM teacher WHERE id = ?", new TeacherMapper(), id);
     }
 
     @Override
-    @Transactional
-    public Teacher addTeacher(Teacher teacher) {
-        final String INSERT_TEACHER = "INSERT INTO teacher(firstName, lastName, specialty) " +
-                "VALUES(?,?,?)";
-        jdbc.update(INSERT_TEACHER,
-                teacher.getFirstName(),
-                teacher.getLastName(),
-                teacher.getSpecialty());
-
-        int newId = jdbc.queryForObject("SELECT LAST_INSERT_ID()", Integer.class);
-        teacher.setId(newId);
-        return teacher;
+    public void addTeacher(Teacher teacher) {
+        jdbc.update("INSERT INTO teacher(name) VALUES(?)", teacher.getName());
     }
-
 
     @Override
     public void updateTeacher(Teacher teacher) {
-        final String UPDATE_TEACHER = "UPDATE teac" +
-                "her SET firstName = ?, lastName = ?, " +
-                "specialty = ? WHERE id = ?";
-        jdbc.update(UPDATE_TEACHER,
-                teacher.getFirstName(),
-                teacher.getLastName(),
-                teacher.getSpecialty(),
-                teacher.getId());
+        jdbc.update("UPDATE teacher SET name = ? WHERE id = ?", teacher.getName(), teacher.getId());
     }
-
 
     @Override
     public void deleteTeacherById(int id) {
-        final String DELETE_TEACHER = "DELETE FROM teacher WHERE id = ?";
-        jdbc.update(DELETE_TEACHER, id);
-    }
-
-    /*
-    Simple RowMapper to convert logic of a Join to a String. We are only
-    displaying the results to screen in this one
-     */
-    public static final class TeacherByCourseMapper implements RowMapper<String> {
-        @Override
-        public String mapRow(ResultSet rs, int index) throws SQLException {
-            // ArrayList <String> TeacherByCourseList = new ArrayList<>();
-            String teacherByCourse = new String();
-            teacherByCourse = rs.getString(1);
-            teacherByCourse += "  ";
-            teacherByCourse += rs.getString(2);
-            teacherByCourse += " teaches ";
-            teacherByCourse += rs.getString(3);
-            //TeacherByCourseList.add(teacherByCourse);
-            return teacherByCourse;
-        }
-    }
-
-    /*
-    RowMapper that converts the Teacher records straight to a Teacher object
-    (in an ArrayList) in order to allow us to do further processing.
-     */
-    public static final class TeacherMapper implements RowMapper<Teacher> {
-        @Override
-        public Teacher mapRow(ResultSet rs, int index) throws SQLException {
-            Teacher teacher = new Teacher();
-            teacher.setId(rs.getInt("id"));
-            teacher.setFirstName(rs.getString("firstName"));
-            teacher.setLastName(rs.getString("lastName"));
-            teacher.setSpecialty(rs.getString("specialty"));
-
-            return teacher;
-        }
-    }
-
-    public static final class MTopicsIDAndTopicTeacherMapper implements RowMapper<Teacher> {
-        @Override
-        public Teacher mapRow(ResultSet rs, int index) throws SQLException {
-            Teacher teacher = new Teacher();
-            teacher.setId(rs.getInt("id"));
-            teacher.setSpecialty(rs.getString("specialty"));
-
-            return teacher;
-        }
+        jdbc.update("DELETE FROM teacher WHERE id = ?", id);
     }
 }

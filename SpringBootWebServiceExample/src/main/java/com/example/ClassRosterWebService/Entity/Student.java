@@ -1,4 +1,4 @@
-package com.example.ClassRosterWebService.Model;
+package com.example.ClassRosterWebService.Entity;
 
 public class Student {
     private int id;
