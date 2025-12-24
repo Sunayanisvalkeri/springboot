@@ -1,4 +1,4 @@
-package com.example.ClassRosterWebService.security;
+package com.example.ClassRosterWebService;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,27 +9,20 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http
-                .csrf(csrf -> csrf.disable()) // Disable CSRF to avoid form redirect issues
+                // Disable CSRF (THIS FIXES YOUR ERROR)
+                .csrf(csrf -> csrf.disable())
+
+                // Allow all requests
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/",
-                                "/students",
-                                "/addStudent",
-                                "/deleteStudent",
-                                "/courses",
-                                "/addCourse",
-                                "/deleteCourse",
-                                "/teachers",
-                                "/css/**",
-                                "/js/**"
-                        ).permitAll()
                         .anyRequest().permitAll()
                 )
-                .formLogin(login -> login.disable())
-                .logout(logout -> logout.disable());
+
+                // Disable login page redirect
+                .formLogin(form -> form.disable())
+                .httpBasic(basic -> basic.disable());
 
         return http.build();
     }

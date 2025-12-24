@@ -2,97 +2,68 @@ package com.example.ClassRosterWebService.Controller;
 
 import com.example.ClassRosterWebService.DAO.StudentDao;
 import com.example.ClassRosterWebService.Entity.Student;
-import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Controller
-@RequestMapping("/students")
 public class StudentController {
 
-    private final StudentDao studentDao;
+    @Autowired
+    StudentDao studentDao;
 
-    public StudentController(StudentDao studentDao) {
-        this.studentDao = studentDao;
-    }
-    @GetMapping("/students/edit/{id}")
-    public String editStudent(@PathVariable int id, Model model) {
-        Student student = studentDao.getStudentById(id);
-        model.addAttribute("student", student);
-        return "edit-student";
-    }
+    // ===================== DISPLAY STUDENTS =====================
+    @GetMapping("/students")
+    public String displayStudents(Model model) {
 
-    @PostMapping("/students/update")
-    public String updateStudent(@ModelAttribute Student student) {
-        studentDao.updateStudent(student);
-        return "redirect:/students";
-    }
+        List<Student> students = studentDao.getAllStudents();
+        model.addAttribute("students", students);
 
-    // ✅ LIST PAGE
-    @GetMapping
-    public String getAllStudents(Model model) {
-        model.addAttribute("students", studentDao.getAllStudents());
         return "students";
     }
 
-    // ✅ SHOW ADD FORM
-    @GetMapping("/add")
-    public String showAddForm(Model model) {
-        model.addAttribute("student", new Student());
-        return "add-student";
-    }
+    // ===================== ADD STUDENT =====================
+    @PostMapping("/addStudent")
+    public String addStudent(@RequestParam String firstName,
+                             @RequestParam String lastName,
+                             @RequestParam String email) {
 
-    // ✅ SAVE STUDENT (FIXED)
-    @PostMapping("/save")
-    public String saveStudent(
-            @Valid @ModelAttribute("student") Student student,
-            BindingResult result,
-            Model model
-    ) {
-
-        // 🔴 FIX #1: Handle validation errors
-        if (result.hasErrors()) {
-            return "add-student";
-        }
-
-        // 🔴 FIX #2: Prevent NULL courseId crash
-        if (student.getCourseId() == 0) {
-            model.addAttribute("error", "Course is required");
-            return "add-student";
-        }
+        Student student = new Student();
+        student.setFirstName(firstName);
+        student.setLastName(lastName);
+        student.setEmail(email);
 
         studentDao.addStudent(student);
+
         return "redirect:/students";
     }
 
-    // ✅ SHOW EDIT FORM
-    @GetMapping("/edit/{id}")
-    public String showEditForm(@PathVariable int id, Model model) {
+    // ===================== DELETE STUDENT =====================
+    @GetMapping("/deleteStudent")
+    public String deleteStudent(@RequestParam int id) {
+
+        studentDao.deleteStudentById(id);
+        return "redirect:/students";
+    }
+
+    // ===================== EDIT STUDENT (LOAD FORM) =====================
+    @GetMapping("/editStudent")
+    public String editStudent(@RequestParam int id, Model model) {
+
         Student student = studentDao.getStudentById(id);
         model.addAttribute("student", student);
+
         return "edit-student";
     }
 
-    // ✅ UPDATE STUDENT (FIXED)
-    @PostMapping("/update")
-    public String updateStudent(
-            @Valid @ModelAttribute("student") Student student,
-            BindingResult result
-    ) {
-        if (result.hasErrors()) {
-            return "edit-student";
-        }
+    // ===================== UPDATE STUDENT =====================
+    @PostMapping("/updateStudent")
+    public String updateStudent(@ModelAttribute Student student) {
 
         studentDao.updateStudent(student);
-        return "redirect:/students";
-    }
-
-    // ✅ DELETE
-    @GetMapping("/delete/{id}")
-    public String deleteStudent(@PathVariable int id) {
-        studentDao.deleteStudentById(id);
         return "redirect:/students";
     }
 }

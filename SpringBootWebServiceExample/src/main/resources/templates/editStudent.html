@@ -2,29 +2,57 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Edit Student</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+        }
+        label {
+            display: inline-block;
+            width: 100px;
+            margin-top: 10px;
+        }
+        input {
+            width: 250px;
+            padding: 5px;
+            margin-top: 10px;
+        }
+        button {
+            margin-top: 20px;
+            padding: 8px 20px;
+        }
+    </style>
 </head>
 <body>
 
 <h2>Edit Student</h2>
 
-<form th:action="@{/students/update}" th:object="${student}" method="post">
+<form th:action="@{/updateStudent}" th:object="${student}" method="post">
 
-    <input type="hidden" th:field="*{id}"/>
+    <!-- Hidden ID -->
+    <input type="hidden" th:field="*{id}" />
 
-    <label>First Name</label>
-    <input type="text" th:field="*{firstName}" required/><br><br>
+    <div>
+        <label>First Name:</label>
+        <input type="text" th:field="*{firstName}" required />
+    </div>
 
-    <label>Last Name</label>
-    <input type="text" th:field="*{lastName}" required/><br><br>
+    <div>
+        <label>Last Name:</label>
+        <input type="text" th:field="*{lastName}" required />
+    </div>
 
-    <label>Email</label>
-    <input type="email" th:field="*{email}" required/><br><br>
-
-    <label>Course ID</label>
-    <input type="number" th:field="*{courseId}" required/><br><br>
+    <div>
+        <label>Email:</label>
+        <input type="email" th:field="*{email}" required />
+    </div>
 
     <button type="submit">Update Student</button>
+
 </form>
+
+<br>
+<a href="/students">Back to Students</a>
 
 </body>
 </html>

@@ -1,90 +1,65 @@
 package com.example.ClassRosterWebService.DAO;
 
-import com.example.ClassRosterWebService.Entity.Student;
+import com.example.ClassRosterWebService.Model.Student;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
 @Repository
 public class StudentDaoDB implements StudentDao {
 
-    private final JdbcTemplate jdbcTemplate;
+    @Autowired
+    private JdbcTemplate jdbc;
 
-    public StudentDaoDB(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
+    private static final class StudentMapper implements RowMapper<Student> {
+        @Override
+        public Student mapRow(ResultSet rs, int rowNum) throws SQLException {
+            Student student = new Student();
+            student.setId(rs.getInt("id"));
+            student.setName(rs.getString("name"));
+            student.setCourseId(rs.getInt("course_id"));
+            return student;
+        }
     }
-
-    // ================= ROW MAPPER =================
-    private final RowMapper<Student> studentMapper = (rs, rowNum) -> {
-        Student student = new Student();
-        student.setId(rs.getInt("id"));
-        student.setFirstName(rs.getString("firstName"));
-        student.setLastName(rs.getString("lastName"));
-        student.setEmail(rs.getString("email"));
-        student.setCourseId(rs.getInt("courseId"));
-        return student;
-    };
-
-    // ================= CRUD =================
 
     @Override
     public List<Student> getAllStudents() {
         final String sql = "SELECT * FROM student";
-        return jdbcTemplate.query(sql, studentMapper);
+        return jdbc.query(sql, new StudentMapper());
     }
 
     @Override
     public Student getStudentById(int id) {
         final String sql = "SELECT * FROM student WHERE id = ?";
-        return jdbcTemplate.queryForObject(sql, studentMapper, id);
+        return jdbc.queryForObject(sql, new StudentMapper(), id);
     }
 
     @Override
     public void addStudent(Student student) {
-        final String sql = """
-            INSERT INTO student (firstName, lastName, email, courseId)
-            VALUES (?, ?, ?, ?)
-        """;
-
-        jdbcTemplate.update(
-                sql,
-                student.getFirstName(),
-                student.getLastName(),
-                student.getEmail(),
-                student.getCourseId()
-        );
+        final String sql = "INSERT INTO student(name, course_id) VALUES(?, ?)";
+        jdbc.update(sql, student.getName(), student.getCourseId());
     }
 
     @Override
     public void updateStudent(Student student) {
-        final String sql = """
-            UPDATE student
-            SET firstName = ?, lastName = ?, email = ?, courseId = ?
-            WHERE id = ?
-        """;
-
-        jdbcTemplate.update(
-                sql,
-                student.getFirstName(),
-                student.getLastName(),
-                student.getEmail(),
-                student.getCourseId(),
-                student.getId()
-        );
+        final String sql = "UPDATE student SET name = ?, course_id = ? WHERE id = ?";
+        jdbc.update(sql, student.getName(), student.getCourseId(), student.getId());
     }
 
     @Override
     public void deleteStudentById(int id) {
         final String sql = "DELETE FROM student WHERE id = ?";
-        jdbcTemplate.update(sql, id);
+        jdbc.update(sql, id);
     }
 
-    // ================= REQUIRED METHOD =================
     @Override
     public List<Student> getStudentByCourse(int courseId) {
-        final String sql = "SELECT * FROM student WHERE courseId = ?";
-        return jdbcTemplate.query(sql, studentMapper, courseId);
+        final String sql = "SELECT * FROM student WHERE course_id = ?";
+        return jdbc.query(sql, new StudentMapper(), courseId);
     }
 }
