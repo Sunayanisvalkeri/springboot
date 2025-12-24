@@ -2,45 +2,48 @@ package com.example.ClassRosterWebService.Controller;
 
 import com.example.ClassRosterWebService.DAO.StudentDao;
 import com.example.ClassRosterWebService.Entity.Student;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+
 import java.util.List;
 
-@RestController
-@RequestMapping("/students")
+@Controller
 public class StudentController {
 
     @Autowired
-    private StudentDao studentDao;
+    StudentDao studentDao;
 
-    @GetMapping
-    public List<Student> getAllStudents() {
-        return studentDao.getAllStudents();
+    @GetMapping("students")
+    public String displayStudents(Model model) {
+        List<Student> students = studentDao.getAllStudents();
+        model.addAttribute("students", students);
+        model.addAttribute("student", new Student()); // IMPORTANT
+        return "students";
     }
 
-    @GetMapping("/{id}")
-    public Student getStudentById(@PathVariable int id) {
-        return studentDao.getStudentById(id);
-    }
+    @PostMapping("addStudent")
+    public String addStudent(
+            @Valid Student student,
+            BindingResult result,
+            Model model) {
 
-    @PostMapping
-    public void addStudent(@RequestBody Student student) {
+        if (result.hasErrors()) {
+            model.addAttribute("students", studentDao.getAllStudents());
+            return "students"; // NO redirect → prevents loop
+        }
+
         studentDao.addStudent(student);
+        return "redirect:/students";
     }
 
-    @PutMapping("/{id}")
-    public void updateStudent(@PathVariable int id, @RequestBody Student student) {
-        student.setId(id);
-        studentDao.updateStudent(student);
-    }
-
-    @DeleteMapping("/{id}")
-    public void deleteStudent(@PathVariable int id) {
+    @GetMapping("deleteStudent")
+    public String deleteStudent(int id) {
         studentDao.deleteStudentById(id);
-    }
-
-    @GetMapping("/course/{courseId}")
-    public List<Student> getStudentsByCourse(@PathVariable int courseId) {
-        return studentDao.getStudentByCourse(courseId);
+        return "redirect:/students";
     }
 }
