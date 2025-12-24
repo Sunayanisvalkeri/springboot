@@ -1,33 +1,24 @@
 package com.example.ClassRosterWebService.Entity;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
-
 public class Student {
 
     private int id;
-
-    @NotBlank(message = "First name is required")
-    @Size(min = 2, max = 50)
     private String firstName;
-
-    @NotBlank(message = "Last name is required")
-    @Size(min = 2, max = 50)
     private String lastName;
-
-    @NotBlank(message = "Email is required")
-    @Email(message = "Invalid email format")
     private String email;
+
+    // ✅ REQUIRED for DAO mapping
+    private int courseId;
 
     public Student() {
     }
 
-    public Student(int id, String firstName, String lastName, String email) {
+    public Student(int id, String firstName, String lastName, String email, int courseId) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
+        this.courseId = courseId;
     }
 
     public int getId() {
@@ -62,6 +53,15 @@ public class Student {
         this.email = email;
     }
 
+    // ✅ FIX FOR YOUR ERROR
+    public int getCourseId() {
+        return courseId;
+    }
+
+    public void setCourseId(int courseId) {
+        this.courseId = courseId;
+    }
+
     @Override
     public String toString() {
         return "Student{" +
@@ -69,6 +69,7 @@ public class Student {
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", email='" + email + '\'' +
+                ", courseId=" + courseId +
                 '}';
     }
 }

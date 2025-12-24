@@ -4,10 +4,17 @@ import com.example.ClassRosterWebService.Entity.Student;
 import java.util.List;
 
 public interface StudentDao {
+
     List<Student> getAllStudents();
-    void addStudent(Student student);
-    void deleteStudentById(int id);
+
     Student getStudentById(int id);
+
+    void addStudent(Student student);
+
     void updateStudent(Student student);
-    List<Student> getStudentByCourse(int courseId); // new method
+
+    void deleteStudentById(int id);
+
+    // REQUIRED — this caused your build failure
+    List<Student> getStudentByCourse(int courseId);
 }
