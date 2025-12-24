@@ -9,60 +9,53 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
-import java.util.List;
-
 @Controller
 public class TeacherController {
+
     @Autowired
     TeacherDao teacherDao;
 
     @GetMapping("teachers")
     public String displayTeachers(Model model) {
-        List<Teacher> teachers = teacherDao.getAllTeachers();
-        List<String> tbc = teacherDao.getTeacherByCourse();
-        for (String s : tbc)
-        {
-            System.out.println(s);
-        }
-
-        /*
-         tbc (teacher by course) is then transferred to the teachercourse HTML attribute on the teachers
-         page (see GetMapping tag). tbc is only an ArrayList of Strings, not objects.
-
-         teachers ArrayList was mapped from the Teachers table to teacher objects and is now
-         written to the HTML attribute teachers
-         */
-        model.addAttribute("teachercourse", tbc);
-        model.addAttribute("teachers", teachers);
+        model.addAttribute("teachers", teacherDao.getAllTeachers());
         return "teachers";
-    }
-
-    @GetMapping("deleteTeacher")
-    public String deleteTeacher(HttpServletRequest request) {
-        int id = Integer.parseInt(request.getParameter("id"));
-        teacherDao.deleteTeacherById(id);
-
-        return "redirect:/teachers";
     }
 
     @PostMapping("addTeacher")
     public String addTeacher(HttpServletRequest request) {
-        String firstName = request.getParameter("firstName");
-        String lastName = request.getParameter("lastName");
-        String specialityIn = request.getParameter("specialty");
-
         Teacher teacher = new Teacher();
-        teacher.setFirstName(firstName);
-        teacher.setLastName(lastName);
-        teacher.setSpecialty(specialityIn);
+        teacher.setFirstName(request.getParameter("firstName"));
+        teacher.setLastName(request.getParameter("lastName"));
+        teacher.setSpecialty(request.getParameter("specialty"));
 
         teacherDao.addTeacher(teacher);
-        if (firstName.length() > 3) {
-            return "redirect:/teachers";
-        }else {
-            return "redirect:/courses";
-        }
+        return "redirect:/teachers";
     }
 
+    @GetMapping("deleteTeacher")
+    public String deleteTeacher(HttpServletRequest request) {
+        teacherDao.deleteTeacherById(Integer.parseInt(request.getParameter("id")));
+        return "redirect:/teachers";
+    }
 
+    // ✅ EDIT TEACHER
+    @GetMapping("editTeacher")
+    public String editTeacher(HttpServletRequest request, Model model) {
+        int id = Integer.parseInt(request.getParameter("id"));
+        model.addAttribute("teacher", teacherDao.getTeacherById(id));
+        return "editTeacher";
+    }
+
+    // ✅ UPDATE TEACHER
+    @PostMapping("updateTeacher")
+    public String updateTeacher(HttpServletRequest request) {
+        Teacher teacher = new Teacher();
+        teacher.setId(Integer.parseInt(request.getParameter("id")));
+        teacher.setFirstName(request.getParameter("firstName"));
+        teacher.setLastName(request.getParameter("lastName"));
+        teacher.setSpecialty(request.getParameter("specialty"));
+
+        teacherDao.updateTeacher(teacher);
+        return "redirect:/teachers";
+    }
 }
