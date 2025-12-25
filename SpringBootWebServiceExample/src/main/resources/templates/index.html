@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Griffith College</title>
+  <style>
+    /* Make the page take full height */
+    html, body {
+      height: 100%;
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    /* Full-page background */
+    body {
+      background-image: url('https://upload.wikimedia.org/wikipedia/commons/3/3e/Griffith_College_Dublin.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    /* Optional overlay to darken the background for better text readability */
+    .overlay {
+      background-color: rgba(0,0,0,0.5);
+      height: 100%;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      color: #fff;
+    }
+
+    h1 {
+      font-size: 48px;
+      margin-bottom: 20px;
+    }
+
+    a.button {
+      display: inline-block;
+      padding: 12px 25px;
+      margin: 10px;
+      background-color: #007bff;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+      font-size: 18px;
+      transition: 0.3s;
+    }
+
+    a.button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+<div class="overlay">
+  <div>
+    <h1>Welcome to Griffith College</h1>
+    <a th:href="@{/students}" class="button">Students Page</a>
+    <a th:href="@{/teachers}" class="button">Teachers Page</a>
+    <a th:href="@{/courses}" class="button">Courses Page</a>
+  </div>
+</div>
+</body>
+</html>

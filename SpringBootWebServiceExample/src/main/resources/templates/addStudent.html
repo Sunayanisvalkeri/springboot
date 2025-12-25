@@ -6,9 +6,9 @@
 <body>
 <h2>Add Student</h2>
 <form th:action="@{/students/add}" th:object="${student}" method="post">
-    Name: <input type="text" th:field="*{name}" required/><br/>
-    Email: <input type="email" th:field="*{email}" required/><br/>
-    Course ID: <input type="number" th:field="*{course}" required/><br/>
+    Name: <input type="text" th:field="*{name}" required /><br/>
+    Email: <input type="email" th:field="*{email}" required /><br/>
+    Course ID: <input type="number" th:field="*{course}" required /><br/>
     <button type="submit">Add Student</button>
 </form>
 <a th:href="@{/students}">Back to Student List</a>
