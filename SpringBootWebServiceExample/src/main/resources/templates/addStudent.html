@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<head xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Add Student</title>
 </head>
@@ -8,9 +8,10 @@
 <form th:action="@{/students/add}" th:object="${student}" method="post">
     Name: <input type="text" th:field="*{name}" required /><br/>
     Email: <input type="email" th:field="*{email}" required /><br/>
-    Course ID: <input type="number" th:field="*{course}" required /><br/>
+    Course: <input type="number" th:field="*{course}" required /><br/>
     <button type="submit">Add Student</button>
 </form>
 <a th:href="@{/students}">Back to Student List</a>
 </body>
 </html>
+

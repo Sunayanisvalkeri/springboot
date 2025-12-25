@@ -1,19 +1,20 @@
-package com.example.ClassRosterWebService.model;
+package com.example.ClassRosterWebService.Entity;
 
 public class Student {
 
     private int id;
-    private String name;
+    private String firstName;
+    private String lastName;
     private String email;
-    private int course;
 
-    public Student() {}
+    public Student() {
+    }
 
-    public Student(int id, String name, String email, int course) {
+    public Student(int id, String firstName, String lastName, String email) {
         this.id = id;
-        this.name = name;
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.email = email;
-        this.course = course;
     }
 
     public int getId() {
@@ -24,12 +25,20 @@ public class Student {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public String getEmail() {
@@ -40,11 +49,13 @@ public class Student {
         this.email = email;
     }
 
-    public int getCourse() {
-        return course;
-    }
-
-    public void setCourse(int course) {
-        this.course = course;
+    @Override
+    public String toString() {
+        return "Student{" +
+                "id=" + id +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", email='" + email + '\'' +
+                '}';
     }
 }

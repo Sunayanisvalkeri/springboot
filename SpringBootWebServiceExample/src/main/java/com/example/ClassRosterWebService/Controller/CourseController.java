@@ -1,52 +1,52 @@
-package com.example.ClassRosterWebService.controller;
+package com.example.ClassRosterWebService.Controller;
 
 import com.example.ClassRosterWebService.DAO.CourseDao;
-import com.example.ClassRosterWebService.model.Course;
+import com.example.ClassRosterWebService.Entity.Course;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import java.util.List;
 
 @Controller
 public class CourseController {
 
     @Autowired
-    private CourseDao courseDao;
+    CourseDao courseDao;
 
-    @GetMapping("/courses")
-    public String listCourses(Model model) {
-        model.addAttribute("courses", courseDao.getAllCourses());
+    @GetMapping("courses")
+    public String displayCourses(Model model) {
+        List<Course> courses = courseDao.getAllCourses();
+        model.addAttribute("courses", courses);
         return "courses";
     }
 
-    @GetMapping("/courses/add")
-    public String showAddForm(Model model) {
-        model.addAttribute("course", new Course());
-        return "add-course";
-    }
-
-    @PostMapping("/courses/add")
-    public String addCourse(@ModelAttribute Course course) {
-        courseDao.addCourse(course);
-        return "redirect:/courses";
-    }
-
-    @GetMapping("/courses/edit/{id}")
-    public String showEditForm(@PathVariable int id, Model model) {
-        Course course = courseDao.getCourseById(id);
-        model.addAttribute("course", course);
-        return "edit-course";
-    }
-
-    @PostMapping("/courses/edit")
-    public String editCourse(@ModelAttribute Course course) {
-        courseDao.updateCourse(course);
-        return "redirect:/courses";
-    }
-
-    @GetMapping("/courses/delete/{id}")
-    public String deleteCourse(@PathVariable int id) {
+    @GetMapping("deleteCourse")
+    public String deleteCourse(HttpServletRequest request) {
+        int id = Integer.parseInt(request.getParameter("id"));
         courseDao.deleteCourseById(id);
         return "redirect:/courses";
+    }
+
+    @PostMapping("addCourse")
+    public String addCourse(HttpServletRequest request) {
+        String courseName = request.getParameter("courseName");
+        String courseCode = request.getParameter("courseCode");
+        String instructor = request.getParameter("instructor");
+
+        Course course = new Course();
+        course.setCourseName(courseName);
+        course.setCourseCode(courseCode);
+        course.setInstructor(instructor);
+
+        courseDao.addCourse(course);
+
+        if (courseName.length() > 3) {
+            return "redirect:/courses";
+        } else {
+            return "redirect:/students";
+        }
     }
 }

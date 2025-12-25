@@ -12,14 +12,14 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // disable CSRF for public forms
+                .csrf(csrf -> csrf.disable()) // Disable CSRF for POST forms
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/", "/students/**", "/teachers/**", "/courses/**").permitAll()
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                         .anyRequest().permitAll()
                 )
-                .formLogin(form -> form.disable()) // no login
-                .logout(logout -> logout.disable()); // no logout
+                .formLogin(form -> form.disable())
+                .logout(logout -> logout.disable());
 
         return http.build();
     }

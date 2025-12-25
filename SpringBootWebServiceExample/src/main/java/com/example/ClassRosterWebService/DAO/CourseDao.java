@@ -1,12 +1,15 @@
 package com.example.ClassRosterWebService.DAO;
 
-import com.example.ClassRosterWebService.model.Course;
+import com.example.ClassRosterWebService.Entity.Course;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 public interface CourseDao {
-    List<Course> getAllCourses();
     Course getCourseById(int id);
-    void addCourse(Course course);
+    List<Course> getAllCourses();
+    @Transactional
+    Course addCourse(Course course);
     void updateCourse(Course course);
     void deleteCourseById(int id);
+    List<String> getCoursesByInstructor(String instructor);
 }
