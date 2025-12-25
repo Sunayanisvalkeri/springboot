@@ -43,7 +43,7 @@ public class StudentDaoDB implements StudentDao {
     }
 
     @Override
-    public void deleteStudent(int id) {
+    public void deleteStudentById(int id) {
         students.removeIf(s -> s.getId() == id);
     }
 

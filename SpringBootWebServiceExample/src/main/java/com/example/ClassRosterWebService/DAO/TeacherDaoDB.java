@@ -1,53 +1,45 @@
 package com.example.ClassRosterWebService.DAO;
 
-import com.example.ClassRosterWebService.Entity.Teacher;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
+import com.example.ClassRosterWebService.model.Teacher;
 import org.springframework.stereotype.Repository;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class TeacherDaoDB implements TeacherDao {
 
-    @Autowired
-    private JdbcTemplate jdbc;
-
-    private static final class TeacherMapper implements RowMapper<Teacher> {
-        @Override
-        public Teacher mapRow(ResultSet rs, int rowNum) throws SQLException {
-            Teacher teacher = new Teacher();
-            teacher.setId(rs.getInt("id"));
-            teacher.setName(rs.getString("name"));
-            return teacher;
-        }
-    }
+    private List<Teacher> teachers = new ArrayList<>();
+    private int currentId = 1;
 
     @Override
-    public List<Teacher> getAllTeachers() {
-        return jdbc.query("SELECT * FROM teacher", new TeacherMapper());
-    }
+    public List<Teacher> getAllTeachers() { return teachers; }
 
     @Override
     public Teacher getTeacherById(int id) {
-        return jdbc.queryForObject("SELECT * FROM teacher WHERE id = ?", new TeacherMapper(), id);
+        Optional<Teacher> t = teachers.stream().filter(te -> te.getId() == id).findFirst();
+        return t.orElse(null);
     }
 
     @Override
     public void addTeacher(Teacher teacher) {
-        jdbc.update("INSERT INTO teacher(name) VALUES(?)", teacher.getName());
+        teacher.setId(currentId++);
+        teachers.add(teacher);
     }
 
     @Override
     public void updateTeacher(Teacher teacher) {
-        jdbc.update("UPDATE teacher SET name = ? WHERE id = ?", teacher.getName(), teacher.getId());
+        Teacher existing = getTeacherById(teacher.getId());
+        if (existing != null) {
+            existing.setName(teacher.getName());
+            existing.setEmail(teacher.getEmail());
+            existing.setSubject(teacher.getSubject());
+        }
     }
 
     @Override
     public void deleteTeacherById(int id) {
-        jdbc.update("DELETE FROM teacher WHERE id = ?", id);
+        teachers.removeIf(t -> t.getId() == id);
     }
 }

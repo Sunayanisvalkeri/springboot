@@ -1,6 +1,6 @@
 package com.example.ClassRosterWebService.DAO;
 
-import com.example.ClassRosterWebService.Entity.Teacher;
+import com.example.ClassRosterWebService.model.Teacher;
 import java.util.List;
 
 public interface TeacherDao {

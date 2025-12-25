@@ -1,14 +1,18 @@
-package com.example.ClassRosterWebService.Entity;
+package com.example.ClassRosterWebService.model;
 
 public class Teacher {
     private int id;
     private String name;
+    private String email;
+    private String subject;
 
     public Teacher() {}
 
-    public Teacher(int id, String name) {
+    public Teacher(int id, String name, String email, String subject) {
         this.id = id;
         this.name = name;
+        this.email = email;
+        this.subject = subject;
     }
 
     public int getId() { return id; }
@@ -16,4 +20,10 @@ public class Teacher {
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
+
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+
+    public String getSubject() { return subject; }
+    public void setSubject(String subject) { this.subject = subject; }
 }

@@ -1,7 +1,6 @@
 package com.example.ClassRosterWebService.DAO;
 
-import com.example.ClassRosterWebService.Entity.Course;
-import com.example.ClassRosterWebService.Entity.Teacher;
+import com.example.ClassRosterWebService.model.Course;
 import java.util.List;
 
 public interface CourseDao {
@@ -10,5 +9,4 @@ public interface CourseDao {
     void addCourse(Course course);
     void updateCourse(Course course);
     void deleteCourseById(int id);
-    List<Course> getCoursesForTeacher(Teacher teacher);
 }

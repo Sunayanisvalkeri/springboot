@@ -1,49 +1,52 @@
-package com.example.ClassRosterWebService.Controller;
+package com.example.ClassRosterWebService.controller;
 
 import com.example.ClassRosterWebService.DAO.CourseDao;
-import com.example.ClassRosterWebService.Entity.Course;
-import com.example.ClassRosterWebService.Entity.Teacher;
+import com.example.ClassRosterWebService.model.Course;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import java.util.List;
 
-@RestController
-@RequestMapping("/courses")
+@Controller
 public class CourseController {
 
     @Autowired
     private CourseDao courseDao;
 
-    @GetMapping
-    public List<Course> getAllCourses() {
-        return courseDao.getAllCourses();
+    @GetMapping("/courses")
+    public String listCourses(Model model) {
+        model.addAttribute("courses", courseDao.getAllCourses());
+        return "courses";
     }
 
-    @GetMapping("/{id}")
-    public Course getCourseById(@PathVariable int id) {
-        return courseDao.getCourseById(id);
+    @GetMapping("/courses/add")
+    public String showAddForm(Model model) {
+        model.addAttribute("course", new Course());
+        return "add-course";
     }
 
-    @PostMapping
-    public void addCourse(@RequestBody Course course) {
+    @PostMapping("/courses/add")
+    public String addCourse(@ModelAttribute Course course) {
         courseDao.addCourse(course);
+        return "redirect:/courses";
     }
 
-    @PutMapping("/{id}")
-    public void updateCourse(@PathVariable int id, @RequestBody Course course) {
-        course.setId(id);
+    @GetMapping("/courses/edit/{id}")
+    public String showEditForm(@PathVariable int id, Model model) {
+        Course course = courseDao.getCourseById(id);
+        model.addAttribute("course", course);
+        return "edit-course";
+    }
+
+    @PostMapping("/courses/edit")
+    public String editCourse(@ModelAttribute Course course) {
         courseDao.updateCourse(course);
+        return "redirect:/courses";
     }
 
-    @DeleteMapping("/{id}")
-    public void deleteCourse(@PathVariable int id) {
+    @GetMapping("/courses/delete/{id}")
+    public String deleteCourse(@PathVariable int id) {
         courseDao.deleteCourseById(id);
-    }
-
-    @GetMapping("/teacher/{teacherId}")
-    public List<Course> getCoursesByTeacher(@PathVariable int teacherId) {
-        Teacher teacher = new Teacher();
-        teacher.setId(teacherId);
-        return courseDao.getCoursesForTeacher(teacher);
+        return "redirect:/courses";
     }
 }

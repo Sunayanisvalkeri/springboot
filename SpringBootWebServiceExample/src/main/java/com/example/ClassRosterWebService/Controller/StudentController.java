@@ -1,6 +1,6 @@
 package com.example.ClassRosterWebService.controller;
 
-import com.example.ClassRosterWebService.DAO.StudentDaoDB;
+import com.example.ClassRosterWebService.DAO.StudentDao;
 import com.example.ClassRosterWebService.model.Student;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 public class StudentController {
 
     @Autowired
-    private StudentDaoDB studentDao;
+    private StudentDao studentDao;
 
     @GetMapping("/students")
     public String listStudents(Model model) {
@@ -46,7 +46,7 @@ public class StudentController {
 
     @GetMapping("/students/delete/{id}")
     public String deleteStudent(@PathVariable int id) {
-        studentDao.deleteStudent(id);
+        studentDao.deleteStudentById(id);
         return "redirect:/students";
     }
 }
